@@ -10,20 +10,24 @@ const stopFollowUrl = "https://www.shrimpy.io/shrimpy/portfolio_deactivate"
 const followUrl = "https://www.shrimpy.io/shrimpy//follow_and_activate";
 const cookie = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY";
 cookieJar.setCookieSync(cookie,"https://www.shrimpy.io/");
+
 const client = axios.create({
   jar: cookieJar,
   withCredentials: true
 });
+
 let lastHistoryItemUpdate;
 const getLeaderHistory = () => {
   return client.get(historyUrl);
 };
+
 const stopFollowingLeader = () => {
   return client.post(stopFollowUrl, {
     "userId": myUserId,
     "payload": {"rebalanceInfoId": XXXXXXXXX, "exchangeAccountId": "XXXXXXXXXXXXX"}
   })
 }
+
 const followUser = () => {
   return client.post(followUrl, {
     "userId": "XXXXXXXXXXXXXXXXXXXX",
@@ -43,6 +47,7 @@ const followUser = () => {
     }
   })
 }
+
 async function checkLeaderAndUpdatePortfolio() {
   let history = await getLeaderHistory();
   let firstHistoryItem = history.data[0];
