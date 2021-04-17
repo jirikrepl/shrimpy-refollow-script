@@ -1,14 +1,15 @@
+require('dotenv').config();
 const axios = require("axios");
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 const tough = require('tough-cookie');
+
+const historyUrl = `https://www.shrimpy.io/shrimpy/leader_history?leaderRebalanceInfoId=${process.env.LEADER_ID}&userId=${process.env.USER_ID}`;
+const stopFollowUrl = "https://www.shrimpy.io/shrimpy/portfolio_deactivate"
+const followUrl = "https://www.shrimpy.io/shrimpy/follow_and_activate";
+
 const cookieJar = new tough.CookieJar();
 axiosCookieJarSupport(axios);
-let leader_id = "76473";
-let myUserId = "XXXXXXXXXXXXXXXXXXXXXXXXXXX";
-const historyUrl = `https://www.shrimpy.io/shrimpy/leader_history?leaderRebalanceInfoId=${leader_id}&userId=${myUserId}`;
-const stopFollowUrl = "https://www.shrimpy.io/shrimpy/portfolio_deactivate"
-const followUrl = "https://www.shrimpy.io/shrimpy//follow_and_activate";
-const cookie = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY";
+const cookie = tough.Cookie.parse(process.env.COOKIE);
 cookieJar.setCookieSync(cookie,"https://www.shrimpy.io/");
 
 const client = axios.create({
@@ -23,17 +24,17 @@ const getLeaderHistory = () => {
 
 const stopFollowingLeader = () => {
   return client.post(stopFollowUrl, {
-    "userId": myUserId,
-    "payload": {"rebalanceInfoId": XXXXXXXXX, "exchangeAccountId": "XXXXXXXXXXXXX"}
+    userId: process.env.USER_ID,
+    payload: { rebalanceInfoId: process.env.REBALANCE_INFO_ID , exchangeAccountId: process.env.EXCHANGE_ACCOUNT_ID },
   })
 }
 
 const followUser = () => {
   return client.post(followUrl, {
-    "userId": "XXXXXXXXXXXXXXXXXXXX",
+    userId: process.env.USER_ID,
     "payload": {
-      "leaderRebalanceInfoId": leader_id,
-      "rebalanceInfoId": XXXXXXXXXXX,
+      "leaderRebalanceInfoId": process.env.LEADER_REBALANCE_INFO_ID,
+      rebalanceInfoId: process.env.REBALANCE_INFO_ID,
       "stopFollowCurrency": "",
       "stopFollowAmountUsd": "0",
       "leaderBillingPlan": {
@@ -55,7 +56,9 @@ async function checkLeaderAndUpdatePortfolio() {
   if (itemJson !== lastHistoryItemUpdate) {
     await stopFollowingLeader();
     await followUser();
+    console.log('re-follow leader at:', new Date());
   }
   lastHistoryItemUpdate = itemJson;
 }
+
 setInterval(checkLeaderAndUpdatePortfolio,10000);
