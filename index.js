@@ -1,3 +1,4 @@
+// credits @Xcxooxl
 require('dotenv').config();
 const axios = require("axios");
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
